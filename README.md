@@ -4,4 +4,4 @@ A simple puzzle app
 
 ## Getting Started
 
-- [Webapp](https://grollcake.github.io/sliding_puzzle_web)
+- [Webapp](https://grollcake.github.io/flutter-webapp/sliding_puzzle)
