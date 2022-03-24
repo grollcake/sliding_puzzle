@@ -36,6 +36,8 @@ class PuzzlePiece extends StatelessWidget {
       curve: Curves.easeOutQuint,
       child: GestureDetector(
         onTap: () => onTap(pieceId),
+        onHorizontalDragEnd: (details) => onTap(pieceId),
+        onVerticalDragEnd: (details) => onTap(pieceId),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(width * .1),
           child: Container(

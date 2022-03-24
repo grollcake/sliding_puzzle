@@ -7,6 +7,7 @@ import 'package:sliding_puzzle/common_widgets/primary_button.dart';
 import 'package:sliding_puzzle/managers/game_controller.dart';
 import 'package:sliding_puzzle/managers/theme_manager.dart';
 import 'package:sliding_puzzle/models/enums.dart';
+import 'package:sliding_puzzle/screens/game_screen/widgets/image_preview.dart';
 import 'package:sliding_puzzle/screens/game_screen/widgets/playing_info.dart';
 import 'package:sliding_puzzle/utils/utils.dart';
 
@@ -20,7 +21,7 @@ class PlayingBottomSection extends StatelessWidget {
       children: [
         Expanded(flex: 1, child: PlayingInfo()),
         Expanded(flex: 3, child: buildImagePreview(context)),
-        Expanded(flex: 1, child: buildRestart(context)),
+        Expanded(flex: 1, child: buildGiveup(context)),
       ],
     );
   }
@@ -29,27 +30,16 @@ class PlayingBottomSection extends StatelessWidget {
     final gameController = context.read<GameController>();
 
     // number일 경우에는 빈 화면만 나오도록 early return 처리
-    if (gameController.gameMode == GameMode.number) return SizedBox();
-
-    final imagePath = context.select((GameController controller) => controller.gameImage);
-    final File? userImage = context.select((GameController controller) => controller.userImage);
-
-    return AspectRatio(
-      aspectRatio: 1,
-      child: LayoutBuilder(
-        builder: (_, constraints) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(constraints.maxWidth * .1),
-            child: imagePath.isNotEmpty
-                ? Image.asset(getPreviewImagePath(imagePath), fit: BoxFit.fill)
-                : Image.file(userImage!, fit: BoxFit.cover),
-          );
-        },
-      ),
-    );
+    if (gameController.gameMode == GameMode.number) {
+      return SizedBox();
+    } else {
+      final String imagePath =
+          gameController.gameImage.isNotEmpty ? gameController.gameImage : gameController.userImage!.path;
+      return ImagePreview(imagePath: imagePath);
+    }
   }
 
-  Widget buildRestart(BuildContext context) {
+  Widget buildGiveup(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Row(
