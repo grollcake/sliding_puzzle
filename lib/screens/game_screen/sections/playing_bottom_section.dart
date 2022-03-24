@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +32,7 @@ class PlayingBottomSection extends StatelessWidget {
     if (gameController.gameMode == GameMode.number) return SizedBox();
 
     final imagePath = context.select((GameController controller) => controller.gameImage);
+    final File? userImage = context.select((GameController controller) => controller.userImage);
 
     return AspectRatio(
       aspectRatio: 1,
@@ -37,7 +40,9 @@ class PlayingBottomSection extends StatelessWidget {
         builder: (_, constraints) {
           return ClipRRect(
             borderRadius: BorderRadius.circular(constraints.maxWidth * .1),
-            child: Image.asset(getPreviewImagePath(imagePath), fit: BoxFit.fill),
+            child: imagePath.isNotEmpty
+                ? Image.asset(getPreviewImagePath(imagePath), fit: BoxFit.fill)
+                : Image.file(userImage!, fit: BoxFit.cover),
           );
         },
       ),

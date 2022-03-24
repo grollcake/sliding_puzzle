@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_puzzle/managers/game_controller.dart';
+import 'package:sliding_puzzle/managers/sound_manager.dart';
 import 'package:sliding_puzzle/models/enums.dart';
 import 'package:sliding_puzzle/screens/game_screen/widgets/starting_countdown.dart';
 import 'package:sliding_puzzle/screens/game_screen/widgets/puzzle_piece.dart';
@@ -14,9 +15,18 @@ class PuzzleSection extends StatefulWidget {
 }
 
 class _PuzzleSectionState extends State<PuzzleSection> {
+  late SoundManager _soundManager;
+
   @override
   void initState() {
     super.initState();
+    _soundManager = SoundManager();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _soundManager.dispose();
   }
 
   @override
@@ -66,5 +76,8 @@ class _PuzzleSectionState extends State<PuzzleSection> {
     final gameController = context.read<GameController>();
     int oldPosition = gameController.getPiecePosition(pieceId);
     int? newPosition = gameController.movePiece(pieceId);
+    if (newPosition != null) {
+      _soundManager.moveSound();
+    }
   }
 }

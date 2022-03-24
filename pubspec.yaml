@@ -16,6 +16,9 @@ dependencies:
   share_plus: ^3.1.0
   screenshot: ^1.2.3
   path_provider: ^2.0.9
+  just_audio: ^0.9.20
+  image_picker: ^0.8.4+11
+  image_cropper: ^1.5.0
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +31,4 @@ flutter:
   assets:
     - assets/images/
     - assets/animations/
+    - assets/audio/

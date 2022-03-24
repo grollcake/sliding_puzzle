@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sliding_puzzle/models/enums.dart';
 import 'package:sliding_puzzle/settings/constants.dart';
@@ -11,6 +12,7 @@ class GameController with ChangeNotifier {
   List<Widget> _piecesContents = [];
   GameMode _gameMode = GameMode.number;
   String _gameImage = 'assets/images/image1.png';
+  File? _userImage;
   GameStatus _gameStatus = GameStatus.ready;
   Stopwatch? _stopwatch;
 
@@ -42,6 +44,8 @@ class GameController with ChangeNotifier {
 
   String get gameImage => _gameImage;
 
+  File? get userImage => _userImage;
+
   GameStatus get gameStatus => _gameStatus;
 
   String get elapsedTime => _elapsedTime;
@@ -57,6 +61,14 @@ class GameController with ChangeNotifier {
 
   set gameImage(String gameImage) {
     _gameImage = gameImage;
+    _gameMode = GameMode.image;
+    _prepareContents();
+    notifyListeners();
+  }
+
+  set userImage(File? userImage) {
+    _userImage = userImage;
+    _gameMode = GameMode.image;
     _prepareContents();
     notifyListeners();
   }
@@ -251,7 +263,9 @@ class GameController with ChangeNotifier {
         verticalCount: _puzzleDimension,
         horizontalSpacing: kPuzzlePieceSpace,
         verticalSpacing: kPuzzlePieceSpace,
-        child: Image.asset(gameImage, fit: BoxFit.cover),
+        child: _gameImage.isNotEmpty
+            ? Image.asset(_gameImage, fit: BoxFit.cover)
+            : Image.file(_userImage!, fit: BoxFit.cover),
       );
     }
   }

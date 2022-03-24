@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_puzzle/common_widgets/primary_button.dart';
 import 'package:sliding_puzzle/managers/game_controller.dart';
@@ -33,9 +37,8 @@ class ReadyBottomSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(_gameDimensions.length, (index) {
         final gameDimension = _gameDimensions[index];
-        final textColor = gameDimension == gameController.puzzleDimension
-            ? ThemeManager.textColor
-            : ThemeManager.inactiveColor;
+        final textColor =
+            gameDimension == gameController.puzzleDimension ? ThemeManager.textColor : ThemeManager.inactiveColor;
         final weight = gameDimension == gameController.puzzleDimension ? FontWeight.w700 : FontWeight.w400;
 
         return GestureDetector(
@@ -85,33 +88,95 @@ class ReadyBottomSection extends StatelessWidget {
     // 기본 이미지 2개와 사용자 선택박스 보여주기
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(_images.length, (index) {
-        final image = _images[index];
-        return Expanded(
-          child: GestureDetector(
-            onTap: () {
-              gameController.gameImage = image;
-            },
-            child: Opacity(
-              opacity: image == gameController.gameImage ? 1.0 : 0.3,
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: LayoutBuilder(
-                  builder: (_, constraints) {
-                    return Container(
-                      margin: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(constraints.maxHeight * .1),
-                        image: DecorationImage(image: AssetImage(getPreviewImagePath(image))),
-                      ),
-                    );
-                  },
-                ),
+      children: [
+        ...buildDefaultImages(gameController),
+        buildUserPhoto(context),
+      ],
+    );
+  }
+
+  /// 기본 이미지 3장을 보여준다.
+  List<Widget> buildDefaultImages(GameController gameController) {
+    return List.generate(_images.length, (index) {
+      final image = _images[index];
+      return Expanded(
+        child: GestureDetector(
+          onTap: () {
+            gameController.gameImage = image;
+          },
+          child: Opacity(
+            opacity: image == gameController.gameImage ? 1.0 : 0.3,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: LayoutBuilder(
+                builder: (_, constraints) {
+                  return Container(
+                    margin: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(constraints.maxHeight * .1),
+                      image: DecorationImage(image: AssetImage(getPreviewImagePath(image))),
+                    ),
+                  );
+                },
               ),
             ),
           ),
-        );
-      }),
+        ),
+      );
+    });
+  }
+
+  /// 폰 앨범에서 사진을 선택한다.
+  Expanded buildUserPhoto(BuildContext context) {
+    final gameController = context.read<GameController>();
+    final File? userImage = context.select((GameController controller) => controller.userImage);
+    final isSelected = gameController.gameMode == GameMode.image &&
+        gameController.gameImage.isEmpty &&
+        gameController.userImage != null;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () async {
+          if (userImage == null || isSelected) {
+            File? userImage = await _pickPhotoFromAlbum();
+            if (userImage != null) {
+              gameController.userImage = userImage;
+              gameController.gameImage = '';
+            }
+          } else {
+            gameController.gameImage = '';
+          }
+        },
+        child: Opacity(
+          opacity: isSelected ? 1.0 : 0.3,
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: LayoutBuilder(
+              builder: (_, constraints) {
+                return Container(
+                  margin: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(constraints.maxHeight * .1),
+                    border: Border.all(
+                      color: Colors.grey,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: userImage == null
+                      ? Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Icon(Icons.add),
+                            ),
+                          ],
+                        )
+                      : Image.file(userImage, fit: BoxFit.cover),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -125,5 +190,19 @@ class ReadyBottomSection extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<File?> _pickPhotoFromAlbum() async {
+    final selected = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (selected == null) return null;
+    final cropped = await ImageCropper().cropImage(
+      sourcePath: selected.path,
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      androidUiSettings: AndroidUiSettings(
+        toolbarTitle: '맘에 드는 부분 선택',
+        hideBottomControls: true,
+      ),
+    );
+    return cropped;
   }
 }

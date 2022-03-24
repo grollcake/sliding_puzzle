@@ -28,9 +28,10 @@ import 'package:sliding_puzzle/sliding_puzzle_app.dart';
 // Done 중도 포기 시 경고화면 표시
 // Done github 레포지토리 분리
 // Done github pages에 배포
+// Done (Epic) 사용자 앨범 이미지로 퍼즐 구현
+// todo 사운드 추가
 // todo 게임방법 소개 영상 링크: https://youtu.be/wD9sn5m5Evs?t=25
 // todo (오류) 화면캡쳐 시 글자 색상 테마가 잘 적용되지 않음
-// todo 사운드 추가
 // todo 게임방법 소개 (유튜브 링크)
 // todo 게임 중 완성률을 계산하여 그래프로 표시 (고양이 대체)
 // todo 파워포인트로 기획서 만들기
@@ -40,7 +41,6 @@ import 'package:sliding_puzzle/sliding_puzzle_app.dart';
 // Done   - 반응형으로 레이아웃 구성
 // todo 게임 아이콘 만들기
 // todo 게임 중지 시 alert dialog 띄우기
-// todo (Epic) 사용자 앨범 이미지로 퍼즐 구현
 // todo (장기) riverpod로 교체
 
 void main() {
