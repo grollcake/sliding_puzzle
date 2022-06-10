@@ -195,14 +195,13 @@ class ReadyBottomSection extends StatelessWidget {
   Future<File?> _pickPhotoFromAlbum() async {
     final selected = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (selected == null) return null;
-    final cropped = await ImageCropper().cropImage(
-      sourcePath: selected.path,
-      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-      androidUiSettings: AndroidUiSettings(
+    final cropped = await ImageCropper()
+        .cropImage(sourcePath: selected.path, aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1), uiSettings: [
+      AndroidUiSettings(
         toolbarTitle: '맘에 드는 부분 선택',
         hideBottomControls: true,
       ),
-    );
-    return cropped;
+    ]);
+    return cropped == null ? null : File(cropped.path);
   }
 }
